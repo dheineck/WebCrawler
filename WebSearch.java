@@ -3,7 +3,7 @@ import java.io.*;
 import java.util.ArrayList;
 
 public class WebSearch {
-	
+
 	public static void main(String[] args) throws Exception {
 
 		// 1. seed page & download html
@@ -23,18 +23,21 @@ public class WebSearch {
         PrintWriter writer = new PrintWriter("webcode.txt", "UTF-8");
 
         while ((line = in.readLine()) != null) {
-            html.add(line);
             if (line.contains("href") && (line.contains("http://") || line.contains("https://"))) {
             	writer.println(line);
             	int startPos = line.indexOf("http://");
-            	int stopPos = line.indexOf("\"", startPos);
-            	String result = line.substring(startPos, stopPos);
-            	writer.println(result);
+            	while (startPos != -1) {
+            		int stopPos = line.indexOf("\"", startPos);
+            		String result = line.substring(startPos, stopPos);
+            		html.add(result);
+            		startPos = line.indexOf("http://", startPos + 1);
+            	}
             }
         }
         in.close();
         writer.close();
-        //System.out.println(html);
+        for (String address : html)
+        	System.out.println(address);
 
 
         // a. parse html for urls
