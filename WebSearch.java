@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 public class WebSearch {
 
+	static ArrayList<String> visited = new ArrayList<String>();
+
 	public static void main(String[] args) throws Exception {
 
 		// 1. seed page & download html
@@ -15,6 +17,7 @@ public class WebSearch {
 
 	public static void search(String url) throws Exception {
 
+		visited.add(url);
         URL url_obj = new URL(url);
         BufferedReader in = new BufferedReader(new InputStreamReader(url_obj.openStream()));
 
@@ -25,12 +28,14 @@ public class WebSearch {
         while ((line = in.readLine()) != null) {
             if (line.contains("href") && (line.contains("http://") || line.contains("https://"))) {
             	writer.println(line);
-            	int startPos = line.indexOf("http://");
+            	int startPos = Math.max(line.indexOf("http://"), line.indexOf("https://"));
             	while (startPos != -1) {
             		int stopPos = line.indexOf("\"", startPos);
             		String result = line.substring(startPos, stopPos);
-            		html.add(result);
-            		startPos = line.indexOf("http://", startPos + 1);
+            		String lastChars = result.substring(result.length()-4);
+            		if (!(lastChars.equals(".css") || lastChars.equals(".jpg") || lastChars.equals(".gif") || lastChars.contains(".js")))
+            			html.add(result);
+            		startPos = Math.max(line.indexOf("http://",startPos+1), line.indexOf("https://",startPos+1));
             	}
             }
         }
